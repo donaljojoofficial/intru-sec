@@ -1,12 +1,10 @@
 <?php
+// src/Controller/RegistrationController.php
 
 namespace App\Controller;
 
-use App\Entity\Intrusec;
-use App\Form\RegistrationFormType;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\UserStorageService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -14,33 +12,57 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RegistrationController extends AbstractController
 {
-    #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em): Response
-    {
-        $user = new Intrusec();
-        $form = $this->createForm(RegistrationFormType::class, $user);
+    private UserStorageService $userStorage;
+    private UserPasswordHasherInterface $passwordHasher;
 
+    public function __construct(UserStorageService $userStorage, UserPasswordHasherInterface $passwordHasher)
+    {
+        $this->userStorage = $userStorage;
+        $this->passwordHasher = $passwordHasher;
+    }
+
+    #[Route('/register', name: 'app_register')]
+    public function register(Request $request): Response
+    {
+        // Use an array for user data instead of entity
+        $user = [
+            'id' => null,
+            'email' => '',
+            'username' => '',
+            'plainPassword' => '',
+            'password' => '',
+            'roles' => ['ROLE_USER']
+        ];
+
+        $form = $this->createForm(\App\Form\RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Check password confirmation matches
-            $plainPassword = $form->get('plainPassword')->getData();
-            $confirmPassword = $form->get('confirmPassword')->getData();
+            $data = $form->getData();
 
-            if ($plainPassword !== $confirmPassword) {
-                $form->get('confirmPassword')->addError(new FormError('Passwords do not match.'));
-            } else {
-                // Hash the password
-                $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
-                $user->setPassword($hashedPassword);
+            // Generate unique id for user (e.g., timestamp)
+            $data['id'] = time();
 
-                $em->persist($user);
-                $em->flush();
+            // Hash password
+            $data['password'] = $this->passwordHasher->hashPassword(
+                null,
+                $data['plainPassword']
+            );
 
-                $this->addFlash('success', 'Registration successful! You can now login.');
+            // Remove plainPassword before saving
+            unset($data['plainPassword']);
 
-                return $this->redirectToRoute('app_login');
-            }
+            // Save user to JSON storage
+            $this->userStorage->addUser(
+                $data['id'],
+                $data['username'],
+                $data['email'],
+                $data['password'],
+                $data['roles']
+            );
+
+            // Redirect or display success message
+            return $this->redirectToRoute('app_login');
         }
 
         return $this->render('registration/register.html.twig', [

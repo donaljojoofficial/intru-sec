@@ -7,9 +7,11 @@ security:
 
   providers:
     intrusec_user_provider:
-      entity:
-        class: App\Entity\Intrusec
-        property: email
+            id: App\Security\JsonUserProvider
+    #intrusec_user_provider:
+     # entity:
+      #  class: App\Entity\Intrusec
+       # property: email
 
   firewalls:
     dev:

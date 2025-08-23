@@ -1,20 +1,30 @@
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
-
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+# config/services.yaml
 parameters:
+    # default parameters can be here
 
 services:
-    # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autowire: true      # Automatically inject dependencies in your services
+        autoconfigure: true # Automatically register your services as commands, event subscribers, etc.
+        public: false       # Services should be private by default
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
-    App\:
-        resource: '../src/'
+    # Your user storage service with project directory parameter
+    #App\Service\UserStorageService: 
+    App\Service\UserStorageService:
+         autowire: true
+         autoconfigure: true
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+        #arguments:
+         #   $projectDir: '%kernel.project_dir%'
+          #  $userStorage: '@App\Service\UserStorageService'
+             
+    # Your custom authenticator with automatic wiring of UrlGeneratorInterface
+    App\Security\IntrucustomAuthenticator: ~
+
+    # Controllers are usually public
+    App\Controller\:
+        resource: '../src/Controller'
+        tags: ['controller.service_arguments']
+        public: true
+
+            
