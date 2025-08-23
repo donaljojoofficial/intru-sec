@@ -16,15 +16,10 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
-
 class IntrucustomAuthenticator extends AbstractLoginFormAuthenticator
 {
     use TargetPathTrait;
-#[Route('/login', name: 'app_login')]
-public function login(AuthenticationUtils $authenticationUtils): Response
-{
-    // ...
-}
+
     public const LOGIN_ROUTE = 'app_login';
 
     public function __construct(private UrlGeneratorInterface $urlGenerator)
@@ -39,9 +34,7 @@ public function login(AuthenticationUtils $authenticationUtils): Response
 
     public function authenticate(Request $request): Passport
     {
-        // Correct way to keep last username based on Symfony 6.4+ changes:
         $email = $request->request->get('email', '');
-
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
 
         return new Passport(
