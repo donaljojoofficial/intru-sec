@@ -15,17 +15,24 @@ security:
       #  class: App\Entity\Intrusec
        # property: email
 
-  firewalls:
+  firewalls: 
     dev:
       pattern: ^/(_(profiler|wdt)|css|images|js)/
       security: false
-      
+    
     main:
       lazy: true
       provider: intrusec_user_provider
       
       custom_authenticators:
         - App\Security\IntrucustomAuthenticator
+      form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true       # Enable CSRF protection
+                csrf_token_id: authenticate   # Optional, default is "authenticate"  
+
+      entry_point: App\Security\IntrucustomAuthenticator
 
       logout:
         path: app_logout

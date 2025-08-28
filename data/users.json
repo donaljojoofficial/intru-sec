@@ -1,1 +1,20 @@
-[]
+[
+    {
+        "id": "68b01164b01fe",
+        "name": "test user",
+        "email": "testuser@email.com",
+        "password": "$2y$13$SGRu3S19yZQzdZxg6QYbCehJwh2IgIi7HAG0xXOTQNmfO1DTBYfze",
+        "roles": [
+            "ROLE_USER"
+        ]
+    },
+    {
+        "id": "68b011ae28043",
+        "name": "test user1",
+        "email": "testuser1@gmail.com",
+        "password": "$2y$13$jg54NHsSk8pJMPeRtaPcX.UFLsr5S0XyHYlg4hNuryq0qWG4C8yYq",
+        "roles": [
+            "ROLE_USER"
+        ]
+    }
+]
