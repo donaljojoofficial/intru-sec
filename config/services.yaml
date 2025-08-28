@@ -1,30 +1,34 @@
 # config/services.yaml
+
 parameters:
-    # default parameters can be here
+    # You can add custom parameters here if needed
 
 services:
     _defaults:
-        autowire: true      # Automatically inject dependencies in your services
-        autoconfigure: true # Automatically register your services as commands, event subscribers, etc.
-        public: false       # Services should be private by default
+        autowire: true        # Automatically inject dependencies
+        autoconfigure: true   # Automatically configure for Symfony features
+        public: false         # Services are private by default
 
-    # Your user storage service with project directory parameter
-    #App\Service\UserStorageService: 
+    # UserStorageService explicitly receives the project directory path
     App\Service\UserStorageService:
-         autowire: true
-         autoconfigure: true
+        arguments:
+            $projectDir: '%kernel.project_dir%'
 
-        #arguments:
-         #   $projectDir: '%kernel.project_dir%'
-          #  $userStorage: '@App\Service\UserStorageService'
-             
-    # Your custom authenticator with automatic wiring of UrlGeneratorInterface
+    # Custom user provider with injected UserStorageService
+    App\Security\JsonUserProvider:
+        arguments:
+            $userStorage: '@App\Service\UserStorageService'
+
+    # Custom authenticator with autowired dependencies
     App\Security\IntrucustomAuthenticator: ~
 
-    # Controllers are usually public
+    # Auto-register controllers, make them public
     App\Controller\:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
         public: true
 
-            
+
+
+
+

@@ -3,12 +3,15 @@
 
 namespace App\Controller;
 
+use App\Security\JsonUser;
 use App\Service\UserStorageService;
+use App\Form\RegistrationFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Form\FormError;
 
 class RegistrationController extends AbstractController
 {
@@ -24,45 +27,61 @@ class RegistrationController extends AbstractController
     #[Route('/register', name: 'app_register')]
     public function register(Request $request): Response
     {
-        // Use an array for user data instead of entity
-        $user = [
-            'id' => null,
+        // Using array as form data because RegistrationFormType uses data_class = null
+        $formData = [
             'email' => '',
-            'username' => '',
+            'name' => '',
             'plainPassword' => '',
-            'password' => '',
-            'roles' => ['ROLE_USER']
+            'confirmPassword' => '',
+            'agreeTerms' => false,
+            'roles' => ['ROLE_USER'], // default
         ];
 
-        $form = $this->createForm(\App\Form\RegistrationFormType::class, $user);
+        $form = $this->createForm(RegistrationFormType::class, $formData);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            // Get submitted data as array
             $data = $form->getData();
 
-            // Generate unique id for user (e.g., timestamp)
-            $data['id'] = time();
+            $plainPassword = $form->get('plainPassword')->getData();
+            $confirmPassword = $form->get('confirmPassword')->getData();
 
-            // Hash password
-            $data['password'] = $this->passwordHasher->hashPassword(
-                null,
-                $data['plainPassword']
-            );
+            // Check if passwords match
+            if ($plainPassword !== $confirmPassword) {
+                $form->get('confirmPassword')->addError(new FormError('Passwords do not match'));
+            } else {
+                // Create user object for password hashing
+                $user = new JsonUser([
+                    'email' => $data['email'],
+                    'password' => '', // placeholder, will set hashed password next
+                    'roles' => ['ROLE_USER'],
+                ]);
 
-            // Remove plainPassword before saving
-            unset($data['plainPassword']);
+                // Hash the plain password
+                $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
 
-            // Save user to JSON storage
-            $this->userStorage->addUser(
-                $data['id'],
-                $data['username'],
-                $data['email'],
-                $data['password'],
-                $data['roles']
-            );
+                // Prepare user data for JSON storage
+                $userData = [
+                    'email' => $data['email'],
+                    'name' => $data['name'] ?? '',
+                    'password' => $hashedPassword,
+                    'roles' => ['ROLE_USER'],
+                ];
 
-            // Redirect or display success message
-            return $this->redirectToRoute('app_login');
+                // Save the user data in your JSON storage service
+                $this->userStorage->addUser(
+                    uniqid(), // Generate an id, you can customize this
+                    $userData['name'],
+                    $userData['email'],
+                    $userData['password'],
+                    $userData['roles']
+                );
+
+                // Redirect or show success message
+                return $this->redirectToRoute('app_login');
+            }
         }
 
         return $this->render('registration/register.html.twig', [
@@ -70,3 +89,6 @@ class RegistrationController extends AbstractController
         ]);
     }
 }
+
+
+

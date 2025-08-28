@@ -1,17 +1,137 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}Welcome{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Space+Grotesk&display=swap" rel="stylesheet" />
+    <style>
+        /* Dark background and green accent color */
+        body {
+            margin: 0; padding: 0;
+            background-color: #121212;
+            color: #00ff00;
+            font-family: 'Space Grotesk', 'Fira Code', monospace, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
+        /* Center container */
+        main {
+            flex: 1 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        /* Form container */
+        .form-box {
+            background-color: #1e1e1e;
+            padding: 2rem 3rem;
+            border-radius: 12px;
+            box-shadow: 0 0 15px #00ff00aa;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        h1 {
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Style inputs */
+        input[type="email"],
+        input[type="password"],
+        input[type="text"],
+        input[type="checkbox"] {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 1rem;
+            background: #121212;
+            border: 1.5px solid #00ff00;
+            border-radius: 8px;
+            color: #00ff00;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #00cc44;
+            box-shadow: 0 0 8px #00cc44aa;
+        }
+
+        label {
+            margin-bottom: 0.5rem;
+            display: block;
+            font-size: 0.9rem;
+            color: #00ee00;
+            user-select: none;
+        }
+
+        /* Checkbox with green highlight */
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        /* Submit button */
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1.2rem;
+            background-color: transparent;
+            color: #00ff00;
+            font-family: 'Fira Code', monospace;
+            border: 2px solid #00ff00;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            user-select: none;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #00ff00;
+            color: #121212;
+        }
+
+        /* Error Message */
+        .form-error-message {
+            color: #ff4444;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            font-family: 'Fira Code', monospace;
+            text-align: center;
+        }
+
+        /* Links */
+        a {
+            color: #00ff00;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 1rem;
+            font-family: 'Fira Code', monospace;
+            user-select: none;
+        }
+
+        a:hover {
+            color: #00cc44;
+        }
+    </style>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+    <main>
         {% block body %}{% endblock %}
-    </body>
+    </main>
+</body>
 </html>

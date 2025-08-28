@@ -1,9 +1,11 @@
 security:
-  
-
   password_hashers:
-    App\Entity\Intrusec:
-      algorithm: auto
+        App\Security\JsonUser:
+            algorithm: auto
+
+  #password_hashers:
+    #App\Entity\Intrusec:
+      #algorithm: auto
 
   providers:
     intrusec_user_provider:
