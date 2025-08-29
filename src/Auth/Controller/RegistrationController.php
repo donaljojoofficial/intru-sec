@@ -1,10 +1,10 @@
 <?php
-// src/Controller/RegistrationController.php
+// src/Auth/Controller/RegistrationController.php
 
-namespace App\Controller;
+namespace App\Auth\Controller;
 
-use App\Security\JsonUser;
-use App\Service\UserStorageService;
+use App\Auth\Security\JsonUser;
+use App\UserManagement\Service\UserStorageService;
 use App\Form\RegistrationFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

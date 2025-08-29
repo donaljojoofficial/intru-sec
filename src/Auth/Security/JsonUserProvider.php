@@ -1,7 +1,8 @@
 <?php
-namespace App\Security;
 
-use App\Service\UserStorageService;
+namespace App\Auth\Security;
+
+use App\UserManagement\Service\UserStorageService;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
@@ -17,7 +18,7 @@ class JsonUserProvider implements UserProviderInterface
 
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
-        $user = $this->userStorage->findUserByEmail($identifier);
+        $user = $this->findUserByEmail($identifier);
         if (!$user) {
             throw new UserNotFoundException(sprintf('User "%s" not found.', $identifier));
         }
@@ -33,4 +34,19 @@ class JsonUserProvider implements UserProviderInterface
     {
         return JsonUser::class === $class;
     }
+
+    public function findUserByEmail(string $email): ?array
+    {
+        $users = $this->userStorage->readUsers();
+
+        foreach ($users as $userData) {
+            if ($userData['email'] === $email) {
+                return $userData;
+            }
+        }
+
+        return null;
+    }
 }
+
+

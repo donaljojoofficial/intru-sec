@@ -1,6 +1,6 @@
 <?php
 // src/Controller/UserController.php
-namespace App\Controller;
+namespace App\UserManagement\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

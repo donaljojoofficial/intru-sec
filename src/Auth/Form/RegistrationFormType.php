@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form;
+namespace App\Auth\Form;
 
 use App\Entity\Intrusec;
 use Symfony\Component\Form\AbstractType;

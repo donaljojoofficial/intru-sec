@@ -1,6 +1,6 @@
 <?php
 // src/Service/UserStorageService.php
-namespace App\Service;
+namespace App\UserManagement\Service;
 
 class UserStorageService
 {
