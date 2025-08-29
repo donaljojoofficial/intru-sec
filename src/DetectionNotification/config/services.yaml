@@ -1,0 +1,4 @@
+services:
+  App\DetectionNotification\:
+    resource: '../../DetectionNotification/*'
+    exclude: '../../DetectionNotification/{config,Tests}'

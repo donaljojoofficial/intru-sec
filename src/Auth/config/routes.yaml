@@ -1,0 +1,4 @@
+auth:
+  resource: '../../Auth/Controller/'
+  type: annotation
+  prefix: /auth

@@ -1,0 +1,4 @@
+detection:
+  resource: '../../Detection/Controller/'
+  type: annotation
+  prefix: /detection

@@ -1,0 +1,10 @@
+services:
+  # Autowire all classes in Auth namespace
+  App\Auth\:
+    resource: '../../Auth/*'
+    exclude: '../../Auth/{config,Tests}'
+
+  # Explicit services (if any)
+  App\Auth\Security\IntrucustomAuthenticator:
+    autowire: true
+    autoconfigure: true

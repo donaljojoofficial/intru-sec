@@ -1,38 +1,32 @@
 security:
   password_hashers:
-        App\Security\JsonUser:
-            algorithm: auto
-
-  #password_hashers:
-    #App\Entity\Intrusec:
-      #algorithm: auto
+    # Updated to your user class in Auth module namespace
+    App\Auth\Security\JsonUser:
+      algorithm: auto
 
   providers:
     intrusec_user_provider:
-            id: App\Security\JsonUserProvider
-    #intrusec_user_provider:
-     # entity:
-      #  class: App\Entity\Intrusec
-       # property: email
+      id: App\Auth\Security\JsonUserProvider
 
-  firewalls: 
+  firewalls:
     dev:
       pattern: ^/(_(profiler|wdt)|css|images|js)/
       security: false
-    
+
     main:
       lazy: true
       provider: intrusec_user_provider
-      
-      custom_authenticators:
-        - App\Security\IntrucustomAuthenticator
-      form_login:
-                login_path: app_login
-                check_path: app_login
-                enable_csrf: true       # Enable CSRF protection
-                csrf_token_id: authenticate   # Optional, default is "authenticate"  
 
-      entry_point: App\Security\IntrucustomAuthenticator
+      custom_authenticators:
+        - App\Auth\Security\IntrucustomAuthenticator
+
+      form_login:
+        login_path: app_login
+        check_path: app_login
+        enable_csrf: true
+        csrf_token_id: authenticate
+
+      entry_point: App\Auth\Security\IntrucustomAuthenticator
 
       logout:
         path: app_logout
@@ -40,7 +34,7 @@ security:
 
       remember_me:
         secret: '%kernel.secret%'
-        lifetime: 604800     # 1 week in seconds
+        lifetime: 604800   # 1 week
         path: /
         always_remember_me: false
 
@@ -48,10 +42,4 @@ security:
     - { path: ^/login$, roles: PUBLIC_ACCESS }
     - { path: ^/register$, roles: PUBLIC_ACCESS }
     - { path: ^/, roles: ROLE_USER }
-
-
-
-
-
-
 

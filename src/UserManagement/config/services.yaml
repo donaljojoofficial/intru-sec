@@ -1,0 +1,4 @@
+services:
+  App\UserManagement\:
+    resource: '../../UserManagement/*'
+    exclude: '../../UserManagement/{config,Tests}'

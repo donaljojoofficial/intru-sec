@@ -1,34 +1,50 @@
 # config/services.yaml
+imports:
+  - { resource: '../src/Auth/config/services.yaml' }
+  - { resource: '../src/Detection/config/services.yaml' }
+  - { resource: '../src/UserManagement/config/services.yaml' }
+  - { resource: '../src/DetectionNotification/config/services.yaml' }
 
 parameters:
-    # You can add custom parameters here if needed
+  # Custom parameters here if needed
 
 services:
-    _defaults:
-        autowire: true        # Automatically inject dependencies
-        autoconfigure: true   # Automatically configure for Symfony features
-        public: false         # Services are private by default
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
 
-    # UserStorageService explicitly receives the project directory path
-    App\Service\UserStorageService:
-        arguments:
-            $projectDir: '%kernel.project_dir%'
+  # UserStorageService explicitly receives the projectDir
+  App\UserManagement\Service\UserStorageService:
+    arguments:
+      $projectDir: '%kernel.project_dir%'
 
-    # Custom user provider with injected UserStorageService
-    App\Security\JsonUserProvider:
-        arguments:
-            $userStorage: '@App\Service\UserStorageService'
+  # Custom user provider with injected UserStorageService
+  App\Auth\Security\JsonUserProvider:
+    arguments:
+      $userStorage: '@App\UserManagement\Service\UserStorageService'
 
-    # Custom authenticator with autowired dependencies
-    App\Security\IntrucustomAuthenticator: ~
+  # Custom authenticator with autowired dependencies
+  App\Auth\Security\IntrucustomAuthenticator: ~
 
-    # Auto-register controllers, make them public
-    App\Controller\:
-        resource: '../src/Controller'
-        tags: ['controller.service_arguments']
-        public: true
+  # Import controllers from different modules explicitly
+  App\Auth\Controller\:
+    resource: '../src/Auth/Controller'
+    tags: ['controller.service_arguments']
+    public: true
 
+  App\Detection\Controller\:
+    resource: '../src/Detection/Controller'
+    tags: ['controller.service_arguments']
+    public: true
 
+  App\UserManagement\Controller\:
+    resource: '../src/UserManagement/Controller'
+    tags: ['controller.service_arguments']
+    public: true
 
-
+  App\DetectionNotification\Controller\:
+    resource: '../src/DetectionNotification/Controller'
+    tags: ['controller.service_arguments']
+    public: true
 

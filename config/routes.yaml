@@ -1,5 +1,14 @@
-controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
-    type: attribute
+imports:
+  - resource: '../../src/Auth/config/routes.yaml'
+  - resource: '../../src/Detection/config/routes.yaml'
+  - resource: '../../src/UserManagement/config/routes.yaml'
+  - resource: '../../src/DetectionNotification/config/routes.yaml'
+
+
+# Other existing route imports stay below
+
+#controllers:
+   # resource:
+     #   path: ../src/Controller/
+     #   namespace: App\Controller
+    #   type: attribute

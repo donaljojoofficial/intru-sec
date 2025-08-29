@@ -5,7 +5,7 @@ namespace App\UserManagement\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\UserStorageService;
+use App\UserManagement\Service\UserStorageService;
 
 class UserController extends AbstractController
 {

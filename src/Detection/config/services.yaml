@@ -1,0 +1,4 @@
+services:
+  App\Detection\:
+    resource: '../../Detection/*'
+    exclude: '../../Detection/{config,Tests}'
