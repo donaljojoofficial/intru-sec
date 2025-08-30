@@ -9,6 +9,11 @@ auth_login:
   controller: App\Auth\Controller\AuthController::login
   methods: [GET, POST]
 
+app_forgot_password:
+  path: /forgot-password
+  controller: App\Landing\Controller\LandingController::index
+  methods: [GET]
+
 auth_register:
   path: /auth/register
   controller: App\Auth\Controller\AuthController::register

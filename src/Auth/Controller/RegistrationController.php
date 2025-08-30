@@ -1,6 +1,4 @@
 <?php
-// src/Auth/Controller/RegistrationController.php
-
 namespace App\Auth\Controller;
 
 use App\Auth\Security\JsonUser;
@@ -26,69 +24,59 @@ class RegistrationController extends AbstractController
 
     #[Route('/auth/register', name: 'auth_register')]
     public function register(Request $request): Response
-    {
-        // Using array as form data because RegistrationFormType uses data_class = null
+    { 
+        // Initialize default form data
         $formData = [
             'email' => '',
             'name' => '',
             'plainPassword' => '',
             'confirmPassword' => '',
             'agreeTerms' => false,
-            'roles' => ['ROLE_USER'], // default
+            'roles' => ['ROLE_USER'], // default role
         ];
 
+        // Create form with initial data
         $form = $this->createForm(RegistrationFormType::class, $formData);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            // Get submitted data as array
             $data = $form->getData();
 
             $plainPassword = $form->get('plainPassword')->getData();
             $confirmPassword = $form->get('confirmPassword')->getData();
 
-            // Check if passwords match
+            // Validate password confirmation
             if ($plainPassword !== $confirmPassword) {
-                $form->get('confirmPassword')->addError(new FormError('Passwords do not match'));
+                $form->get('confirmPassword')->addError(new FormError('Passwords do not match.'));
             } else {
-                // Create user object for password hashing
+                // Create a new user for password hashing
                 $user = new JsonUser([
                     'email' => $data['email'],
-                    'password' => '', // placeholder, will set hashed password next
+                    'password' => '',
                     'roles' => ['ROLE_USER'],
                 ]);
 
-                // Hash the plain password
+                // Hash the password
                 $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
 
-                // Prepare user data for JSON storage
-                $userData = [
-                    'email' => $data['email'],
-                    'name' => $data['name'] ?? '',
-                    'password' => $hashedPassword,
-                    'roles' => ['ROLE_USER'],
-                ];
-
-                // Save the user data in your JSON storage service
+                // Save user with hashed password using your storage service
                 $this->userStorage->addUser(
-                    uniqid(), // Generate an id, you can customize this
-                    $userData['name'],
-                    $userData['email'],
-                    $userData['password'],
-                    $userData['roles']
+                    uniqid(),
+                    $data['name'] ?? '',
+                    $data['email'],
+                    $hashedPassword,
+                    ['ROLE_USER']
                 );
 
-                // Redirect or show success message
+                // Redirect to login after successful registration
                 return $this->redirectToRoute('auth_login');
             }
         }
 
+        // Pass the form view as 'registrationForm' to Twig template
         return $this->render('auth/register.html.twig', [
             'registrationForm' => $form->createView(),
         ]);
     }
 }
-
-
 

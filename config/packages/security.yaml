@@ -39,10 +39,10 @@ security:
         always_remember_me: false
 
   access_control:
-  - { path: ^/login$, roles: PUBLIC_ACCESS }
-  - { path: ^/register$, roles: PUBLIC_ACCESS }
-  - { path: ^/$, roles: PUBLIC_ACCESS }          # Allow anonymous access to landing page
-  - { path: ^/secured-path, roles: ROLE_USER }   # Protect secured sections explicitly
-  - { path: ^/, roles: ROLE_USER }                # Catch-all for other protected paths
+  - { path: ^/auth/login$, roles: PUBLIC_ACCESS }
+  - { path: ^/auth/register$, roles: PUBLIC_ACCESS }
+  - { path: ^/auth/$, roles: PUBLIC_ACCESS }          # Allow anonymous access to landing page
+  - { path: ^/auth/secured-path, roles: ROLE_USER }   # Protect secured sections explicitly
+  - { path: ^/auth/, roles: ROLE_USER }                # Catch-all for other protected paths
 
   

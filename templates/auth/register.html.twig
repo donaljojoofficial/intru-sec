@@ -1,25 +1,674 @@
+{# templates/auth/register.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Register - IntruNex{% endblock %}
 
-{% block body %}
-<div class="form-box">
-    <h1>Create Account</h1>
+{% block stylesheets %}
+<style>
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+    }
 
-    {{ form_start(registrationForm) }}
+    .auth-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 3rem;
+        width: 100%;
+        max-width: 500px;
+        backdrop-filter: blur(20px);
+        box-shadow: 
+            0 20px 60px rgba(0, 0, 0, 0.5),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        position: relative;
+        overflow: hidden;
+    }
 
-        {{ form_errors(registrationForm) }}
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(240, 147, 251, 0.1) 0%, transparent 70%);
+        animation: rotate 30s linear infinite reverse;
+    }
 
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.name) }}
-        {{ form_row(registrationForm.plainPassword) }}
-        {{ form_row(registrationForm.confirmPassword) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 
-        <button type="submit">Register</button>
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        position: relative;
+        z-index: 1;
+    }
 
-    {{ form_end(registrationForm) }}
+    .auth-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: var(--secondary-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        position: relative;
+        animation: pulse 2s ease-in-out infinite;
+    }
 
-    <a href="{{ path('auth_login') }}">Already have an account? Login</a>
-</div>
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(240, 147, 251, 0.4); }
+        70% { box-shadow: 0 0 0 20px rgba(240, 147, 251, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(240, 147, 251, 0); }
+    }
+
+    .auth-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 2rem;
+        font-weight: 700;
+        background: var(--secondary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .input-group {
+        position: relative;
+    }
+
+    .input-group-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        transition: color 0.3s ease;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        background: rgba(10, 14, 39, 0.6);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #f093fb;
+        background: rgba(10, 14, 39, 0.8);
+        box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.1);
+    }
+
+    .form-control:focus ~ .input-group-icon {
+        color: #f093fb;
+    }
+
+    .form-control::placeholder {
+        color: rgba(168, 175, 199, 0.5);
+    }
+
+    /* Password Strength Indicator */
+    .password-strength {
+        margin-top: 0.5rem;
+        height: 4px;
+        background: rgba(10, 14, 39, 0.6);
+        border-radius: 2px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .password-strength-bar {
+        height: 100%;
+        width: 0;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+
+    .strength-weak {
+        width: 33%;
+        background: #ef4444;
+    }
+
+    .strength-medium {
+        width: 66%;
+        background: #f59e0b;
+    }
+
+    .strength-strong {
+        width: 100%;
+        background: #10b981;
+    }
+
+    .password-requirements {
+        margin-top: 0.5rem;
+        padding: 0.75rem;
+        background: rgba(10, 14, 39, 0.4);
+        border-radius: 8px;
+        font-size: 0.85rem;
+    }
+
+    .requirement {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.25rem;
+        transition: color 0.3s ease;
+    }
+
+    .requirement.met {
+        color: #10b981;
+    }
+
+    .requirement i {
+        font-size: 0.8rem;
+    }
+
+    .form-checkbox {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-checkbox input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        accent-color: #f093fb;
+        cursor: pointer;
+        margin-top: 2px;
+        flex-shrink: 0;
+    }
+
+    .form-checkbox label {
+        color: var(--text-secondary);
+        cursor: pointer;
+        user-select: none;
+        font-size: 0.9rem;
+    }
+
+    .form-checkbox label a {
+        color: #f093fb;
+        text-decoration: none;
+    }
+
+    .form-checkbox label a:hover {
+        text-decoration: underline;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 1rem;
+        background: var(--secondary-gradient);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(-100%);
+        transition: transform 0.5s ease;
+    }
+
+    .btn-primary:hover::before {
+        transform: translateX(0);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 2rem 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border-color);
+    }
+
+    .divider span {
+        padding: 0 1rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .social-login {
+        display: flex;
+        gap: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .social-btn {
+        flex: 1;
+        padding: 0.75rem;
+        background: rgba(10, 14, 39, 0.6);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--text-primary);
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .social-btn:hover {
+        background: rgba(10, 14, 39, 0.8);
+        border-color: #f093fb;
+        transform: translateY(-2px);
+    }
+
+    .auth-footer {
+        margin-top: 2rem;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-footer p {
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-footer a {
+        color: #f093fb;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .auth-footer a:hover {
+        color: #f5576c;
+        text-decoration: underline;
+    }
+
+    /* Progress Steps */
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .progress-steps::before {
+        content: '';
+        position: absolute;
+        top: 15px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--border-color);
+        z-index: -1;
+    }
+
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .step-circle {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--card-bg);
+        border: 2px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        transition: all 0.3s ease;
+    }
+
+    .step.active .step-circle {
+        background: var(--secondary-gradient);
+        border-color: transparent;
+        color: white;
+    }
+
+    .step-label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+
+    /* Loading State */
+    .btn-loading {
+        position: relative;
+        color: transparent;
+        pointer-events: none;
+    }
+
+    .btn-loading::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        top: 50%;
+        left: 50%;
+        margin-left: -10px;
+        margin-top: -10px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spinner 0.6s linear infinite;
+    }
+
+    @keyframes spinner {
+        to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 480px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .auth-card {
+            padding: 2rem 1.5rem;
+        }
+    }
+</style>
 {% endblock %}
+
+{% block body %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join IntruNex to secure your digital assets</p>
+        </div>
+
+        <div class="progress-steps">
+            <div class="step active">
+                <div class="step-circle">1</div>
+                <span class="step-label">Account</span>
+            </div>
+            <div class="step">
+                <div class="step-circle">2</div>
+                <span class="step-label">Verify</span>
+            </div>
+            <div class="step">
+                <div class="step-circle">3</div>
+                <span class="step-label">Complete</span>
+            </div>
+        </div>
+
+        {{ form_start(registrationForm) }}
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="firstName">First Name</label>
+                    <div class="input-group">
+                        <i class="fas fa-user input-group-icon"></i>
+                        {{ form_widget(registrationForm.firstName|default(form.firstName), {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'John'
+                            }
+                        }) }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="lastName">Last Name</label>
+                    <div class="input-group">
+                        <i class="fas fa-user input-group-icon"></i>
+                        {{ form_widget(registrationForm.lastName|default(form.lastName), {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Doe'
+                            }
+                        }) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <div class="input-group">
+                    <i class="fas fa-envelope input-group-icon"></i>
+                    {{ form_widget(registrationForm.email|default(form.email), {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': 'you@example.com'
+                        }
+                    }) }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <div class="input-group">
+                    <i class="fas fa-lock input-group-icon"></i>
+                    {{ form_widget(registrationForm.plainPassword|default(form.plainPassword), {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': 'Create a strong password',
+                            'id': 'password'
+                        }
+                    }) }}
+                </div>
+                <div class="password-strength">
+                    <div class="password-strength-bar" id="strengthBar"></div>
+                </div>
+                <div class="password-requirements" id="requirements">
+                    <div class="requirement" id="length">
+                        <i class="fas fa-circle"></i>
+                        At least 8 characters
+                    </div>
+                    <div class="requirement" id="uppercase">
+                        <i class="fas fa-circle"></i>
+                        One uppercase letter
+                    </div>
+                    <div class="requirement" id="number">
+                        <i class="fas fa-circle"></i>
+                        One number
+                    </div>
+                    <div class="requirement" id="special">
+                        <i class="fas fa-circle"></i>
+                        One special character
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-checkbox">
+                {{ form_widget(registrationForm.agreeTerms|default(form.agreeTerms)) }}
+                <label for="{{ registrationForm.agreeTerms.vars.id|default(form.agreeTerms.vars.id) }}">
+                    I agree to the <a href="{{ path('app_terms'|default('#')) }}" target="_blank">Terms of Service</a> 
+                    and <a href="{{ path('app_privacy'|default('#')) }}" target="_blank">Privacy Policy</a>
+                </label>
+            </div>
+
+            <button type="submit" class="btn-primary" id="registerBtn">
+                <span>Create Account</span>
+            </button>
+        {{ form_end(registrationForm) }}
+
+        <div class="divider">
+            <span>OR</span>
+        </div>
+
+        <div class="social-login">
+            <button class="social-btn" title="Sign up with Google">
+                <i class="fab fa-google"></i>
+            </button>
+            <button class="social-btn" title="Sign up with GitHub">
+                <i class="fab fa-github"></i>
+            </button>
+            <button class="social-btn" title="Sign up with Microsoft">
+                <i class="fab fa-microsoft"></i>
+            </button>
+        </div>
+
+        <div class="auth-footer">
+            <p>Already have an account?</p>
+            <a href="{{ path('auth_login'|default('/auth/login')) }}">Sign In</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Password strength checker
+    const passwordInput = document.getElementById('password');
+    const strengthBar = document.getElementById('strengthBar');
+    const requirements = {
+        length: document.getElementById('length'),
+        uppercase: document.getElementById('uppercase'),
+        number: document.getElementById('number'),
+        special: document.getElementById('special')
+    };
+
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            
+            // Check length
+            if (password.length >= 8) {
+                requirements.length.classList.add('met');
+                requirements.length.querySelector('i').className = 'fas fa-check-circle';
+                strength++;
+            } else {
+                requirements.length.classList.remove('met');
+                requirements.length.querySelector('i').className = 'fas fa-circle';
+            }
+            
+            // Check uppercase
+            if (/[A-Z]/.test(password)) {
+                requirements.uppercase.classList.add('met');
+                requirements.uppercase.querySelector('i').className = 'fas fa-check-circle';
+                strength++;
+            } else {
+                requirements.uppercase.classList.remove('met');
+                requirements.uppercase.querySelector('i').className = 'fas fa-circle';
+            }
+            
+            // Check number
+            if (/[0-9]/.test(password)) {
+                requirements.number.classList.add('met');
+                requirements.number.querySelector('i').className = 'fas fa-check-circle';
+                strength++;
+            } else {
+                requirements.number.classList.remove('met');
+                requirements.number.querySelector('i').className = 'fas fa-circle';
+            }
+            
+            // Check special character
+            if (/[^A-Za-z0-9]/.test(password)) {
+                requirements.special.classList.add('met');
+                requirements.special.querySelector('i').className = 'fas fa-check-circle';
+                strength++;
+            } else {
+                requirements.special.classList.remove('met');
+                requirements.special.querySelector('i').className = 'fas fa-circle';
+            }
+            
+            // Update strength bar
+            strengthBar.className = 'password-strength-bar';
+            if (strength === 0) {
+                strengthBar.style.width = '0';
+            } else if (strength <= 2) {
+                strengthBar.classList.add('strength-weak');
+            } else if (strength === 3) {
+                strengthBar.classList.add('strength-medium');
+            } else {
+                strengthBar.classList.add('strength-strong');
+            }
+        });
+    }
+
+    // Add loading state to form submission
+    document.getElementById('registerBtn').addEventListener('click', function(e) {
+        if (this.closest('form').checkValidity()) {
+            this.classList.add('btn-loading');
+        }
+    });
+</script>
+{% endblock %}
+

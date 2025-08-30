@@ -1,30 +1,465 @@
-{# login.html.twig #}
+{# templates/auth/login.html.twig #}
 {% extends 'base.html.twig' %}
-
 
 {% block title %}Login - IntruNex{% endblock %}
 
-{% block body %}
-<div class="form-box">
-    <h1>Login</h1>
+{% block stylesheets %}
+<style>
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+    }
 
-    {% if error %}
-        <div class="form-error-message">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+    .auth-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 3rem;
+        width: 100%;
+        max-width: 450px;
+        backdrop-filter: blur(20px);
+        box-shadow: 
+            0 20px 60px rgba(0, 0, 0, 0.5),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        position: relative;
+        overflow: hidden;
+    }
 
-    <form action="{{ path('auth_login') }}" method="post">
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+        animation: rotate 30s linear infinite;
+    }
 
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" value="{{ last_username }}" required autofocus />
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required />
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        position: relative;
+        z-index: 1;
+    }
 
-        <button type="submit">Login</button>
-    </form>
+    .auth-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: var(--primary-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        position: relative;
+        animation: pulse 2s ease-in-out infinite;
+    }
 
-    <a href="{{ path('app_register') }}">Don't have an account? Register</a>
-</div>
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+        70% { box-shadow: 0 0 0 20px rgba(102, 126, 234, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+    }
+
+    .auth-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 2rem;
+        font-weight: 700;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .input-group {
+        position: relative;
+    }
+
+    .input-group-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        transition: color 0.3s ease;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        background: rgba(10, 14, 39, 0.6);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        background: rgba(10, 14, 39, 0.8);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-control:focus ~ .input-group-icon {
+        color: #667eea;
+    }
+
+    .form-control::placeholder {
+        color: rgba(168, 175, 199, 0.5);
+    }
+
+    .form-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-checkbox input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        accent-color: #667eea;
+        cursor: pointer;
+    }
+
+    .form-checkbox label {
+        color: var(--text-secondary);
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 1rem;
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(-100%);
+        transition: transform 0.5s ease;
+    }
+
+    .btn-primary:hover::before {
+        transform: translateX(0);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 2rem 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border-color);
+    }
+
+    .divider span {
+        padding: 0 1rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .social-login {
+        display: flex;
+        gap: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .social-btn {
+        flex: 1;
+        padding: 0.75rem;
+        background: rgba(10, 14, 39, 0.6);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--text-primary);
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .social-btn:hover {
+        background: rgba(10, 14, 39, 0.8);
+        border-color: #667eea;
+        transform: translateY(-2px);
+    }
+
+    .auth-footer {
+        margin-top: 2rem;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-footer p {
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-footer a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .auth-footer a:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+
+    .forgot-password {
+        display: inline-block;
+        margin-top: 0.5rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+    }
+
+    .forgot-password:hover {
+        color: #667eea;
+    }
+
+    /* Security Indicator */
+    .security-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 8px;
+        color: #10b981;
+        font-size: 0.85rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .security-indicator i {
+        font-size: 1rem;
+    }
+
+    /* Loading State */
+    .btn-loading {
+        position: relative;
+        color: transparent;
+        pointer-events: none;
+    }
+
+    .btn-loading::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        top: 50%;
+        left: 50%;
+        margin-left: -10px;
+        margin-top: -10px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spinner 0.6s linear infinite;
+    }
+
+    @keyframes spinner {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Error Animation */
+    .shake {
+        animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+</style>
 {% endblock %}
+
+{% block body %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i class="fas fa-shield-halved"></i>
+            </div>
+            <h1 class="auth-title">Welcome Back</h1>
+            <p class="auth-subtitle">Sign in to access your security dashboard</p>
+        </div>
+
+        {% if error|default(false) %}
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{{ path('auth_login'|default('/auth/login')) }}">
+            {% if csrf_token is defined %}
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            {% endif %}
+
+            <div class="form-group">
+                <label class="form-label" for="inputEmail">Email Address</label>
+                <div class="input-group">
+                    <i class="fas fa-envelope input-group-icon"></i>
+                    <input type="email" 
+                           name="email" 
+                           id="inputEmail" 
+                           class="form-control" 
+                           value="{{ last_username|default('') }}" 
+                           placeholder="you@example.com" 
+                           required 
+                           autofocus>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="inputPassword">Password</label>
+                <div class="input-group">
+                    <i class="fas fa-lock input-group-icon"></i>
+                    <input type="password" 
+                           name="password" 
+                           id="inputPassword" 
+                           class="form-control" 
+                           placeholder="Enter your password" 
+                           required>
+                </div>
+            </div>
+
+            <div class="form-checkbox">
+                <input type="checkbox" name="_remember_me" id="rememberMe">
+                <label for="rememberMe">Remember me for 30 days</label>
+            </div>
+
+            <button type="submit" class="btn-primary" id="loginBtn">
+                <span>Sign In</span>
+            </button>
+
+            <a href="{{ path('app_forgot_password'|default('#')) }}" class="forgot-password">
+                Forgot your password?
+            </a>
+        </form>
+
+        <div class="divider">
+            <span>OR</span>
+        </div>
+
+        <div class="social-login">
+            <button class="social-btn" title="Login with Google">
+                <i class="fab fa-google"></i>
+            </button>
+            <button class="social-btn" title="Login with GitHub">
+                <i class="fab fa-github"></i>
+            </button>
+            <button class="social-btn" title="Login with Microsoft">
+                <i class="fab fa-microsoft"></i>
+            </button>
+        </div>
+
+        <div class="security-indicator">
+            <i class="fas fa-lock"></i>
+            <span>Secure 256-bit SSL encryption</span>
+        </div>
+
+        <div class="auth-footer">
+            <p>Don't have an account?</p>
+            <a href="{{ path('auth_register'|default('/auth/register')) }}">Create Account</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add loading state to form submission
+    document.getElementById('loginBtn').addEventListener('click', function(e) {
+        if (this.closest('form').checkValidity()) {
+            this.classList.add('btn-loading');
+        }
+    });
+
+    // Add shake animation on error
+    {% if error|default(false) %}
+        document.querySelector('.auth-card').classList.add('shake');
+    {% endif %}
+</script>
+{% endblock %}
+
 
