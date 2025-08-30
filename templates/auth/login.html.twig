@@ -1,6 +1,8 @@
+{# login.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Login - MyApp{% endblock %}
+
+{% block title %}Login - IntruNex{% endblock %}
 
 {% block body %}
 <div class="form-box">
@@ -10,7 +12,7 @@
         <div class="form-error-message">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}
 
-    <form action="{{ path('app_login') }}" method="post">
+    <form action="{{ path('auth_login') }}" method="post">
     <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
         <label for="email">Email</label>

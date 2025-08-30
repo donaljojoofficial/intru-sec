@@ -1,4 +1,0 @@
-usermanagement:
-  resource: '../../UserManagement/Controller/'
-  type: annotation
-  prefix: /user

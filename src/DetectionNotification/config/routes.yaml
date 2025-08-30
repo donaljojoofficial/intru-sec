@@ -1,4 +1,0 @@
-detection_notification:
-  resource: '../../DetectionNotification/Controller/'
-  type: annotation
-  prefix: /notification

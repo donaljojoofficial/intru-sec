@@ -19,7 +19,13 @@ class UserController extends AbstractController
     #[Route('/user/add', name: 'user_add')]
     public function addUser(): Response
     {
-        $added = $this->userStorage->addUser(1, 'Alice', 'alice@example.com');
+        // Replace these with actual values, e.g., from a request or form
+        $username = 'exampleUser';
+        $email = 'user@example.com';
+        $password = 'examplePassword';
+        $role = 'ROLE_USER';
+
+        $added = $this->userStorage->addUser($username, $email, $password, $role);
 
         if ($added) {
             return new Response('User added successfully.');

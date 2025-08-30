@@ -1,14 +1,51 @@
-imports:
-  - resource: '../../src/Auth/config/routes.yaml'
-  - resource: '../../src/Detection/config/routes.yaml'
-  - resource: '../../src/UserManagement/config/routes.yaml'
-  - resource: '../../src/DetectionNotification/config/routes.yaml'
+# config/routes.yaml
+landing_homepage:
+  path: /
+  controller: App\Landing\Controller\LandingController::index
+  methods: [GET]
 
+auth_login:
+  path: /auth/login
+  controller: App\Auth\Controller\AuthController::login
+  methods: [GET, POST]
 
-# Other existing route imports stay below
+auth_register:
+  path: /auth/register
+  controller: App\Auth\Controller\AuthController::register
+  methods: [GET, POST]
 
-#controllers:
-   # resource:
-     #   path: ../src/Controller/
-     #   namespace: App\Controller
-    #   type: attribute
+detection_homepage:
+  path: /detection
+  controller: App\Detection\Controller\ExploitController::index
+  methods: [GET]
+
+detection_detect:
+  path: /detection/detect
+  controller: App\Detection\Controller\ExploitController::detect
+  methods: [POST]
+
+detection_history:
+  path: /detection/history
+  controller: App\Detection\Controller\ExploitController::history
+  methods: [GET]
+
+detection_export:
+  path: /detection/export
+  controller: App\Detection\Controller\ExploitController::export
+  methods: [GET]
+
+user_add:
+  path: /user/add
+  controller: App\UserManagement\Controller\UserController::addUser
+  methods: [GET]
+
+user_list:
+  path: /user/list
+  controller: App\UserManagement\Controller\UserController::listUsers
+  methods: [GET]
+
+notification_test:
+  path: /notification/test
+  controller: App\DetectionNotification\Controller\NotificationController::test
+  methods: [GET]
+

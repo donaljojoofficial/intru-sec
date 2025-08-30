@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register - MyApp{% endblock %}
+{% block title %}Register - IntruNex{% endblock %}
 
 {% block body %}
 <div class="form-box">
@@ -20,6 +20,6 @@
 
     {{ form_end(registrationForm) }}
 
-    <a href="{{ path('app_login') }}">Already have an account? Login</a>
+    <a href="{{ path('auth_login') }}">Already have an account? Login</a>
 </div>
 {% endblock %}

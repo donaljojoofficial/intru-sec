@@ -1,9 +1,9 @@
 # config/services.yaml
-imports:
-  - { resource: '../src/Auth/config/services.yaml' }
-  - { resource: '../src/Detection/config/services.yaml' }
-  - { resource: '../src/UserManagement/config/services.yaml' }
-  - { resource: '../src/DetectionNotification/config/services.yaml' }
+#imports:
+#  - { resource: '../src/Auth/config/services.yaml' }
+ # - { resource: '../src/Detection/config/services.yaml' }
+  #- { resource: '../src/UserManagement/config/services.yaml' }
+  #- { resource: '../src/DetectionNotification/config/services.yaml' }
 
 parameters:
   # Custom parameters here if needed
@@ -45,6 +45,11 @@ services:
 
   App\DetectionNotification\Controller\:
     resource: '../src/DetectionNotification/Controller'
+    tags: ['controller.service_arguments']
+    public: true
+
+  App\Landing\Controller\:
+    resource: '../src/Landing/Controller'
     tags: ['controller.service_arguments']
     public: true
 

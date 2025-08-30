@@ -5,7 +5,7 @@ namespace App\Auth\Controller;
 
 use App\Auth\Security\JsonUser;
 use App\UserManagement\Service\UserStorageService;
-use App\Form\RegistrationFormType;
+use App\Auth\Form\RegistrationFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,7 +24,7 @@ class RegistrationController extends AbstractController
         $this->passwordHasher = $passwordHasher;
     }
 
-    #[Route('/register', name: 'app_register')]
+    #[Route('/auth/register', name: 'auth_register')]
     public function register(Request $request): Response
     {
         // Using array as form data because RegistrationFormType uses data_class = null
@@ -80,11 +80,11 @@ class RegistrationController extends AbstractController
                 );
 
                 // Redirect or show success message
-                return $this->redirectToRoute('app_login');
+                return $this->redirectToRoute('auth_login');
             }
         }
 
-        return $this->render('registration/register.html.twig', [
+        return $this->render('auth/register.html.twig', [
             'registrationForm' => $form->createView(),
         ]);
     }
